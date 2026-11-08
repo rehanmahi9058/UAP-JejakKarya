@@ -15,6 +15,7 @@
         ['nama' => 'Katalog Portofolio', 'url' => '#', 'aktif' => false],
        ['nama' => 'Peta Karier', 'url' => route('peta-karier.index'), 'aktif' => request()->routeIs('peta-karier.*')],
         ['nama' => 'Sesi Mentoring', 'url' => '#', 'aktif' => false],
+        ['nama' => 'Profil Saya', 'url' => route('profil.edit'), 'aktif' => request()->routeIs('profil.*')],
     ];
 @endphp
 <div class="min-h-screen md:flex">

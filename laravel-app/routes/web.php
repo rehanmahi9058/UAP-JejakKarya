@@ -30,3 +30,8 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+Route::middleware('auth')->group(function () {
+    Route::get('profil', [\App\Http\Controllers\ProfilPenggunaController::class, 'edit'])->name('profil.edit');
+    Route::put('profil', [\App\Http\Controllers\ProfilPenggunaController::class, 'update'])->name('profil.update');
+});
