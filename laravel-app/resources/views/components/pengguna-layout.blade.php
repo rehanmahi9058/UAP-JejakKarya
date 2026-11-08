@@ -13,7 +13,7 @@
     $menu = [
         ['nama' => 'Ringkasan', 'url' => route('dashboard'), 'aktif' => request()->routeIs('dashboard')],
         ['nama' => 'Katalog Portofolio', 'url' => '#', 'aktif' => false],
-        ['nama' => 'Peta Karier', 'url' => '#', 'aktif' => false],
+       ['nama' => 'Peta Karier', 'url' => route('peta-karier.index'), 'aktif' => request()->routeIs('peta-karier.*')],
         ['nama' => 'Sesi Mentoring', 'url' => '#', 'aktif' => false],
     ];
 @endphp
