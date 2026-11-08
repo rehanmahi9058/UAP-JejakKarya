@@ -20,7 +20,12 @@ class RencanaKarier extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function langkah()
+    public function bidangKarier()
+    {
+        return $this->belongsTo(BidangKarier::class, 'bidang_karier_id');
+    }
+
+    public function langkahKarier()
     {
         return $this->hasMany(LangkahKarier::class, 'rencana_karier_id');
     }

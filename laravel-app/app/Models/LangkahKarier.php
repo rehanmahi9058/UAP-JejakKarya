@@ -15,7 +15,7 @@ class LangkahKarier extends Model
         return ['target_tanggal' => 'date', 'selesai' => 'boolean'];
     }
 
-    public function rencana()
+    public function rencanaKarier()
     {
         return $this->belongsTo(RencanaKarier::class, 'rencana_karier_id');
     }
