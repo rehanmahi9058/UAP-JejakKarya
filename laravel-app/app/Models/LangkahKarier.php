@@ -19,4 +19,9 @@ class LangkahKarier extends Model
     {
         return $this->belongsTo(RencanaKarier::class, 'rencana_karier_id');
     }
+
+    public function rencana()
+{
+    return $this->rencanaKarier();
+}
 }
