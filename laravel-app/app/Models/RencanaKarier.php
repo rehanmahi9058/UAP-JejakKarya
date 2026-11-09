@@ -30,6 +30,11 @@ class RencanaKarier extends Model
         return $this->hasMany(LangkahKarier::class, 'rencana_karier_id');
     }
 
+    public function langkah()
+{
+    return $this->langkahKarier();
+}
+
     public function progres(): int
     {
         $total = $this->langkah()->count();
