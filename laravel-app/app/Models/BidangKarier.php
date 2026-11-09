@@ -8,10 +8,10 @@ class BidangKarier extends Model
 {
     protected $table = 'bidang_karier';
 
-    protected $fillable = [
-        'nama_bidang',
-        'deskripsi',
-    ];
+      protected $fillable = [
+       'nama',          // sebelumnya 'nama_bidang'
+       'deskripsi',
+   ];
 
     public function profilMentor()
     {

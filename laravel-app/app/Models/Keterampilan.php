@@ -13,15 +13,15 @@ class Keterampilan extends Model
         'deskripsi',
     ];
 
-    public function users()
-    {
-        return $this->belongsToMany(
-            User::class,
-            'users_keterampilan',
-            'keterampilan_id',
-            'user_id'
-        );
-    }
+       public function users()
+   {
+       return $this->belongsToMany(
+           User::class,
+           'users_keterampilan',
+           'keterampilan_id',
+           'users_id'          // sebelumnya 'user_id'
+       );
+   }
 
     public function entriPortofolio()
     {
