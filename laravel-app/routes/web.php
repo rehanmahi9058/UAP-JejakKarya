@@ -35,3 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::get('profil', [\App\Http\Controllers\ProfilPenggunaController::class, 'edit'])->name('profil.edit');
     Route::put('profil', [\App\Http\Controllers\ProfilPenggunaController::class, 'update'])->name('profil.update');
 });
+
+Route::middleware('auth')->group(function () {
+    Route::get('katalog', [\App\Http\Controllers\KatalogController::class, 'index'])->name('katalog.index');
+    Route::get('katalog/{id}', [\App\Http\Controllers\KatalogController::class, 'show'])->name('katalog.show');
+});
