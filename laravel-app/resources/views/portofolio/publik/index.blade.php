@@ -8,7 +8,7 @@
     $namaBidang = collect($bidang instanceof \Illuminate\Support\Collection ? $bidang : [$bidang])->filter()
         ->map(fn ($b) => $b->nama_bidang ?? $b->nama ?? null)->filter()->values();
     $semuaSkill = $entri->flatMap(fn ($e) => $e->keterampilan->pluck('nama_keterampilan'))->unique()->sort()->values();
-    $bisaPesan = \Illuminate\Support\Facades\Route::has('katalog.slot') && ! (auth()->check() && $mentor->user_id == auth()->id());
+    $bisaPesan = \Illuminate\Support\Facades\Route::has('katalog.slot') && ! (auth()->check() && ($mentor->user_id == auth()->id() || auth()->user()->peran === 'mentor'));
 @endphp
 <section class="hero">
     <div class="eyebrow">Portofolio Mentor</div>

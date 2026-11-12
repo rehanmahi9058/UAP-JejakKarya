@@ -13,7 +13,7 @@
     <a href="{{ url('/') }}" class="brand" style="margin:0"><i>▣</i><span>Jejak<b>Karier</b></span></a>
     <nav>
         <a href="{{ url('/') }}">Beranda</a>
-        <a href="{{ $rt('katalog.index') }}" class="on">Cari Mentor</a>
+        @if (! auth()->check() || auth()->user()->peran !== 'mentor')<a href="{{ $rt('katalog.index') }}" class="on">Cari Mentor</a>@endif
         @if (! auth()->check() || auth()->user()->peran !== 'mentor')<a href="{{ $rt('peta-karier.index') }}">Peta Karier</a>@endif
     </nav>
     <div>

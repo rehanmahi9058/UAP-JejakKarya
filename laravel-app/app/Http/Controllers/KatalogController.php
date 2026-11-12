@@ -24,8 +24,18 @@ class KatalogController extends Controller
             ->whereRaw('(select count(*) from users_keterampilan where users_keterampilan.users_id = profil_mentor.user_id) >= 3');
     }
 
+        // Mentor tidak boleh mencari mentor lain: arahkan ke jadwal mentoringnya sendiri
+    private function tolakMentor()
+    {
+        if (auth()->user()->peran === 'mentor') {
+            return redirect()->route('mentor.slot.index')
+                ->with('error', 'Mentor tidak dapat mencari mentor lain. Kelola jadwal mentoringmu di sini.');
+        }
+    }
+
     public function index(Request $request)
     {
+        if ($tolak = $this->tolakMentor()) return $tolak;
         $query = $this->mentorLayak();
 
         if ($kata = trim((string) $request->query('q'))) {
@@ -59,6 +69,7 @@ class KatalogController extends Controller
 
     public function show($id)
     {
+        if ($tolak = $this->tolakMentor()) return $tolak;
         $mentor = $this->mentorLayak()->findOrFail($id);
 
         $entri = DB::table('entri_portofolio')

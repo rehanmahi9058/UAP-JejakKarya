@@ -25,6 +25,18 @@ class ProfilMentor extends Model
         'diverifikasi_pada' => 'datetime',
     ];
 
+    public static function untukUser(int $userId): self
+    {
+        return static::firstOrCreate(
+            ['user_id' => $userId],
+            [
+                'bidang_karier_id' => BidangKarier::value('id') ?? BidangKarier::create(['nama' => 'Umum'])->id,
+                'jabatan' => 'Mentor',
+                'status_verifikasi' => 'menunggu',
+            ]
+        );
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

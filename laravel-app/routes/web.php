@@ -49,7 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('mentor/portofolio/{entri}/terbit', [\App\Http\Controllers\PortofolioMentorController::class, 'terbit'])->name('mentor.portofolio.terbit');
 });
 
-Route::get('portofolio/{mentor}', [\App\Http\Controllers\PortofolioPublikController::class, 'index'])->name('portofolio.publik');
+Route::get('portofolio/{mentor}', [\App\Http\Controllers\PortofolioPublikController::class, 'index'])->name('portofolio.publik.index');
 Route::get('portofolio/{mentor}/{entri}', [\App\Http\Controllers\PortofolioPublikController::class, 'show'])->name('portofolio.publik.show');
 
 Route::middleware('auth')->group(function () {

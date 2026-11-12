@@ -13,18 +13,24 @@ class SesiMentoringController extends Controller
     public function index()
     {
         $query = SesiMentoring::with(['slotMentoring.profilMentor.user', 'user'])->latest();
+        $jadwal = collect();
 
         if (auth()->user()->peran === 'mentor') {
-            // Mentor melihat sesi yang masuk ke slot miliknya
-            $profil = ProfilMentor::where('user_id', auth()->id())->first();
-            $query->whereHas('slotMentoring', fn ($q) => $q->where('profil_mentor_id', $profil?->id));
+            // Mentor: sesi yang masuk ke slotnya + daftar tanggal mentoring mendatang
+            $profil = ProfilMentor::untukUser(auth()->id());
+            $query->whereHas('slotMentoring', fn ($q) => $q->where('profil_mentor_id', $profil->id));
+
+            $jadwal = $profil->slotMentoring()->with('sesiMentoring.user')
+                ->whereDate('tanggal', '>=', today())
+                ->orderBy('tanggal')->orderBy('jam_mulai')->get()
+                ->groupBy(fn ($s) => $s->tanggal->format('Y-m-d'));
         } else {
-            // Pengguna melihat sesi yang ia pesan
+            // Pengguna: sesi yang ia pesan
             $query->where('user_id', auth()->id());
         }
 
         $daftar = $query->get();
-        return view('sesi.index', compact('daftar'));
+        return view('sesi.index', compact('daftar', 'jadwal'));
     }
 
     public function store(Request $request, SlotMentoring $slot)
@@ -34,6 +40,7 @@ class SesiMentoringController extends Controller
             'catatan' => 'nullable|string|max:1000',
         ]);
 
+        abort_if(auth()->user()->peran === 'mentor', 403, 'Mentor tidak dapat memesan sesi mentoring.');
         abort_if($slot->profilMentor->user_id == auth()->id(), 403, 'Tidak bisa memesan slot sendiri.');
 
         $sesi = DB::transaction(function () use ($slot, $data) {

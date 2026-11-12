@@ -1,14 +1,17 @@
-{{-- Dashboard MENTOR. DashboardController@mentor: $profil, $entri, $slot, $sesi, $menunggu, $berikutnya, $syarat --}}
+{{-- Dashboard MENTOR. DashboardController@mentor: $profil, $entri, $slot, $sesi, $menunggu, $berikutnya, $syarat, $jadwal --}}
 @extends('layouts.dasbor')
 @section('judul', 'Ringkasan Mentor')
 @section('isi')
-@php $layak = collect($syarat)->every(fn ($v) => $v); @endphp
+@php
+    $layak = collect($syarat)->every(fn ($v) => $v);
+    $kelasSlot = ['tersedia' => 'ok', 'dipesan' => '', 'ditutup' => 'gr'];
+@endphp
 <div class="head">
     <div><div class="eyebrow">Ringkasan Mentor</div><h1>Halo, {{ auth()->user()->name }}!</h1>
-        <p>{{ $profil ? $profil->jabatan : 'Profil mentormu belum dilengkapi.' }} Kelola portofolio, jadwal, dan sesi mentoringmu dari sini.</p></div>
+        <p>{{ $profil->jabatan }}. Kelola portofolio, jadwal, dan sesi mentoringmu dari sini.</p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
         <a class="btn soft" href="{{ route('mentor.portofolio.create') }}">+ Tambah Entri</a>
-        @if ($profil)<a class="btn" href="{{ route('mentor.slot.create') }}">+ Tambah Slot</a>@endif
+        <a class="btn" href="{{ route('mentor.slot.create') }}">+ Tambah Mentoring</a>
     </div>
 </div>
 
@@ -17,6 +20,31 @@
     <a class="card stat" href="{{ route('mentor.slot.index') }}"><small>Slot tersedia</small><strong>{{ $slot->where('status', 'tersedia')->count() }}</strong><span>{{ $slot->where('status', 'dipesan')->count() }} dipesan</span></a>
     <a class="card stat" href="{{ route('sesi.index') }}"><small>Menunggu konfirmasi</small><strong>{{ $sesi->where('status', 'diajukan')->count() }}</strong></a>
     <a class="card stat" href="{{ route('sesi.index') }}"><small>Sesi selesai</small><strong>{{ $sesi->where('status', 'selesai')->count() }}</strong></a>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+    <div class="bar" style="margin-bottom:6px">
+        <div><h3>Jadwal mentoring mendatang</h3><p style="color:var(--mu)">Tanggal-tanggal kamu membuka sesi mentoring.</p></div>
+        <a class="btn" href="{{ route('mentor.slot.create') }}">+ Tambah Mentoring</a>
+    </div>
+    @forelse ($jadwal as $hari => $slots)
+        @php $tgl = \Carbon\Carbon::parse($hari); @endphp
+        <div class="row" style="align-items:flex-start">
+            <div style="width:170px;flex:none">
+                <strong>{{ $tgl->translatedFormat('D, j M Y') }}</strong>
+                @if ($tgl->isToday())<span class="chip wr" style="margin-left:6px">Hari ini</span>@elseif ($tgl->isTomorrow())<span class="chip" style="margin-left:6px">Besok</span>@endif
+            </div>
+            <div class="tags" style="flex:1">
+                @foreach ($slots as $s)
+                    @php $aktif = $s->sesiMentoring->firstWhere(fn ($x) => $x->status !== 'dibatalkan'); @endphp
+                    <span class="chip {{ $kelasSlot[$s->status] ?? 'gr' }}">{{ substr($s->jam_mulai, 0, 5) }}–{{ substr($s->jam_selesai, 0, 5) }} · {{ $s->status === 'dipesan' && $aktif ? $aktif->user->name : ucfirst($s->status) }}</span>
+                @endforeach
+            </div>
+        </div>
+    @empty
+        <p class="empty" style="padding:28px 0">Belum ada jadwal mentoring. Klik “+ Tambah Mentoring” untuk membuka sesi pada tanggal tertentu.</p>
+    @endforelse
+    <p style="margin-top:12px"><a class="link" href="{{ route('sesi.index') }}">Lihat semua jadwal &amp; sesi →</a></p>
 </div>
 
 <div class="grid2">
@@ -55,7 +83,7 @@
                 <li><span class="ic {{ $ok ? 'y' : '' }}">{{ $ok ? '✓' : '–' }}</span>{{ $teks }}</li>
             @endforeach
         </ul>
-        @if ($profil && $layak)
+        @if ($layak)
             <p style="margin-top:14px"><a class="link" href="{{ route('portofolio.publik.index', $profil->id) }}" target="_blank" rel="noopener">Lihat halaman publikku ↗</a></p>
         @elseif (! $entri->where('status', 'terbit')->count())
             <p style="margin-top:14px"><a class="link" href="{{ route('mentor.portofolio.index') }}">Terbitkan portofolio →</a></p>

@@ -4,7 +4,7 @@
 @section('isi')
 @php
     $tgl = fn ($d) => $d ? \Carbon\Carbon::parse($d) : null;
-    $bisaPesan = \Illuminate\Support\Facades\Route::has('katalog.slot') && ! (auth()->check() && $mentor->user_id == auth()->id());
+    $bisaPesan = \Illuminate\Support\Facades\Route::has('katalog.slot') && ! (auth()->check() && ($mentor->user_id == auth()->id() || auth()->user()->peran === 'mentor'));
 @endphp
 <div class="pwrap narrow" style="padding-top:28px">
     <a href="{{ route('portofolio.publik.index', $mentor->id) }}" style="color:var(--mu);font-weight:600">← Semua portofolio {{ $mentor->user->name }}</a>

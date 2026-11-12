@@ -8,9 +8,16 @@ use Illuminate\Http\Request;
 
 class SlotMentoringController extends Controller
 {
+    // ---- Sisi pengguna: slot tersedia milik satu mentor ----
 
     public function tersedia($id)
     {
+        // Mentor tidak boleh mencari / memesan mentor lain
+        if (auth()->user()->peran === 'mentor') {
+            return redirect()->route('mentor.slot.index')
+                ->with('error', 'Mentor tidak dapat memesan sesi. Kelola jadwal mentoringmu di sini.');
+        }
+
         $mentor = ProfilMentor::with('user')->where('status_verifikasi', 'terverifikasi')->findOrFail($id);
         $daftar = $mentor->slotMentoring()
             ->where('status', 'tersedia')->whereDate('tanggal', '>=', today())
@@ -18,6 +25,8 @@ class SlotMentoringController extends Controller
 
         return view('katalog.slot', compact('mentor', 'daftar'));
     }
+
+    // ---- Sisi mentor: kelola slot sendiri ----
 
     public function index()
     {
@@ -61,12 +70,16 @@ class SlotMentoringController extends Controller
         return redirect()->route('mentor.slot.index')->with('sukses', 'Slot jadwal dihapus.');
     }
 
+    // ---- Helper ----
+
+    // Profil mentor milik user yang login (dibuat otomatis kalau belum ada, jadi tidak lagi 404)
     private function profil()
     {
         abort_unless(auth()->user()->peran === 'mentor', 403);
-        return ProfilMentor::where('user_id', auth()->id())->firstOrFail();
+        return ProfilMentor::untukUser(auth()->id());
     }
 
+    // Slot harus milik mentor yang login dan belum dipesan
     private function milik(SlotMentoring $slot)
     {
         abort_unless($slot->profil_mentor_id == $this->profil()->id, 403);

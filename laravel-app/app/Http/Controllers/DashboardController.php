@@ -39,19 +39,22 @@ class DashboardController extends Controller
     private function mentor()
     {
         $user = auth()->user();
-        $profil = ProfilMentor::where('user_id', $user->id)->first();
+        $profil = ProfilMentor::untukUser($user->id);
         $entri = EntriPortofolio::where('user_id', $user->id)->get();
-        $slot = $profil ? $profil->slotMentoring()->get() : collect();
-        $sesi = $profil
-            ? SesiMentoring::with(['slotMentoring', 'user'])
-                ->whereHas('slotMentoring', fn ($q) => $q->where('profil_mentor_id', $profil->id))->get()
-            : collect();
+        $slot = $profil->slotMentoring()->with('sesiMentoring.user')->get();
+        $sesi = SesiMentoring::with(['slotMentoring', 'user'])
+            ->whereHas('slotMentoring', fn ($q) => $q->where('profil_mentor_id', $profil->id))->get();
         $jumlahSkill = DB::table('users_keterampilan')->where('users_id', $user->id)->count();
 
         $menunggu = $sesi->where('status', 'diajukan')->sortBy(fn ($s) => $this->urut($s))->take(5);
         $berikutnya = $sesi->where('status', 'dikonfirmasi')
             ->filter(fn ($s) => $s->slotMentoring->tanggal->gte(today()))
             ->sortBy(fn ($s) => $this->urut($s))->first();
+
+        // Tanggal mentoring mendatang (dikelompokkan per tanggal, maksimal 5 tanggal)
+        $jadwal = $slot->filter(fn ($s) => $s->tanggal->gte(today()))
+            ->sortBy(fn ($s) => $s->tanggal->format('Y-m-d').$s->jam_mulai)
+            ->groupBy(fn ($s) => $s->tanggal->format('Y-m-d'))->take(5);
 
         $syarat = [
             'Profil mentor diverifikasi admin' => $profil && $profil->status_verifikasi === 'terverifikasi',
@@ -60,7 +63,7 @@ class DashboardController extends Controller
             'Akun aktif' => (bool) $user->aktif,
         ];
 
-        return view('dashboard-mentor', compact('profil', 'entri', 'slot', 'sesi', 'menunggu', 'berikutnya', 'syarat'));
+        return view('dashboard-mentor', compact('profil', 'entri', 'slot', 'sesi', 'menunggu', 'berikutnya', 'syarat', 'jadwal'));
     }
 
     private function urut($sesi)
