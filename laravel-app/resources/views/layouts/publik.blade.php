@@ -14,7 +14,7 @@
     <nav>
         <a href="{{ url('/') }}">Beranda</a>
         <a href="{{ $rt('katalog.index') }}" class="on">Cari Mentor</a>
-        <a href="{{ $rt('peta-karier.index') }}">Peta Karier</a>
+        @if (! auth()->check() || auth()->user()->peran !== 'mentor')<a href="{{ $rt('peta-karier.index') }}">Peta Karier</a>@endif
     </nav>
     <div>
         @auth
