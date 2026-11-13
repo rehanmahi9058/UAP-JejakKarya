@@ -11,31 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('profil_mentor', function (Blueprint $table) {
-            $table->id();
-
-        // Relasi dengan tabel users
-            $table->foreignId('user_id')
-              ->unique()
-              ->constrained('users')
-              ->cascadeOnDelete();
-
-        // Relasi dengan tabel bidang_karir
-            $table->foreignId('bidang_karier_id')
-              ->constrained('bidang_karier')
-              ->cascadeOnDelete();
-
-            $table->string('jabatan');
-            $table->text('pengalaman_kerja')->nullable();
-            $table->unsignedTinyInteger('tahun_pengalaman')->default(0);
-            $table->text('topik_mentoring')->nullable();
-
-            $table->string('status_verifikasi', 30)->default('menunggu');
-            $table->text('catatan_verifikasi')->nullable();
-            $table->timestamp('diverifikasi_pada')->nullable();
-
-            $table->timestamps();
-        });
+      Schema::create('profil_mentor', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+    $table->foreignId('bidang_karier_id')->nullable()->constrained('bidang_karier')->nullOnDelete();
+    $table->string('jabatan')->nullable();
+    $table->integer('tahun_pengalaman')->nullable();
+    $table->text('pengalaman_kerja')->nullable();
+    $table->string('topik_mentoring')->nullable();
+    $table->enum('status_verifikasi', ['menunggu', 'terverifikasi', 'ditolak'])->default('menunggu');
+    $table->text('catatan_verifikasi')->nullable();
+    $table->timestamp('diverifikasi_pada')->nullable();
+    $table->timestamps();
+});
     }
 
     /**

@@ -17,6 +17,10 @@
         ['nama' => 'Sesi Mentoring', 'url' => '#', 'aktif' => false],
         ['nama' => 'Profil Saya', 'url' => route('profil.edit'), 'aktif' => request()->routeIs('profil.*')],
     ];
+
+    if (auth()->user()->peran === 'admin') {
+    $menu[] = ['nama' => 'Kelola Mentor dan Akun', 'url' => route('admin.index'), 'aktif' => request()->routeIs('admin.*')];
+}
 @endphp
 <div class="min-h-screen md:flex">
 

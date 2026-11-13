@@ -11,24 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sesi_mentoring', function (Blueprint $table) {
-            $table->id();
-
-            $table->foreignId('slot_mentoring_id')
-                  ->constrained('slot_mentoring')
-                  ->cascadeOnDelete();
-
-            $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete();
-
-            $table->text('tujuan_sesi')->nullable();
-            $table->text('catatan')->nullable();
-
-            $table->enum('status', ['diajukan','dikonfirmasi','selesai','dibatalkan'])->default('diajukan');
-
-            $table->timestamps();
-        });
+       Schema::create('sesi_mentoring', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('slot_mentoring_id')->unique()->constrained('slot_mentoring')->cascadeOnDelete();
+    $table->foreignId('pengguna_id')->constrained('users')->cascadeOnDelete();
+    $table->text('tujuan_sesi');
+    $table->enum('status', ['diajukan', 'dikonfirmasi', 'selesai', 'dibatalkan', 'ditolak'])->default('diajukan');
+    $table->text('catatan_mentor')->nullable();
+    $table->timestamps();
+});
     }
 
     /**

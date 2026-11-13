@@ -3,13 +3,10 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [\App\Http\Controllers\BerandaController::class, 'index'])->name('beranda');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -36,7 +33,16 @@ Route::middleware('auth')->group(function () {
     Route::put('profil', [\App\Http\Controllers\ProfilPenggunaController::class, 'update'])->name('profil.update');
 });
 
+Route::get('katalog', [\App\Http\Controllers\KatalogController::class, 'index'])->name('katalog.index');
+
 Route::middleware('auth')->group(function () {
-    Route::get('katalog', [\App\Http\Controllers\KatalogController::class, 'index'])->name('katalog.index');
     Route::get('katalog/{id}', [\App\Http\Controllers\KatalogController::class, 'show'])->name('katalog.show');
 });
+
+Route::middleware(['auth', \App\Http\Middleware\AdminSaja::class])
+    ->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\AdminController::class, 'index'])->name('index');
+        Route::patch('mentor/{id}/verifikasi', [\App\Http\Controllers\AdminController::class, 'verifikasi'])->name('mentor.verifikasi');
+        Route::patch('mentor/{id}/cabut', [\App\Http\Controllers\AdminController::class, 'cabutVerifikasi'])->name('mentor.cabut');
+        Route::patch('akun/{user}/toggle', [\App\Http\Controllers\AdminController::class, 'toggleAkun'])->name('akun.toggle');
+    });
